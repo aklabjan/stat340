@@ -1,0 +1,47 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+editor_options:
+  chunk_output_type: inline
+chunk_output_type: inline
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+data <- read.csv("student-mat.csv")
+```
+
+```{r}
+grades <- data %>% select(G1,G2,G3)
+pairs(grades)
+cor(grades)
+```
+```{r}
+lmG1 <- lm(G3~G1,data = grades)
+lmG2 <- lm(G3~G2,data = grades)
+pc <- prcomp(grades, scale=TRUE)
+lm <- lm(grades$G3 ~ pc$x[,1])
+summary(lmG1)
+summary(lmG2)
+summary(lm)
+```
+
+```{r}
+sum(residuals(lm)^2)
+sum(residuals(lmG1)^2)
+sum(residuals(lmG2)^2)
+```
+```{r}
+plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)")
+abline(h=0,col = "red")
+
+```
+There seems to be a strong correlation between the grades students had at the beginning of the year, the middle and the end. This was expected from our data. A linear model seems to be appropriate although when looking at the residual graph there are several outliers on the negative end. This is a pattern to further explore. 
