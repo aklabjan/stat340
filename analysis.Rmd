@@ -1,22 +1,20 @@
 ---
 title: "R Notebook"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
   word_document: default
 editor_options:
   chunk_output_type: inline
 chunk_output_type: inline
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r}
 library(tidyverse)
+library(ggplot2)
 data <- read.csv("student-mat.csv")
+data
 ```
 
 ```{r}
@@ -42,6 +40,65 @@ sum(residuals(lmG2)^2)
 ```{r}
 plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)")
 abline(h=0,col = "red")
-
 ```
-There seems to be a strong correlation between the grades students had at the beginning of the year, the middle and the end. This was expected from our data. A linear model seems to be appropriate although when looking at the residual graph there are several outliers on the negative end. This is a pattern to further explore. 
+There seems to be a strong correlation between the grades students had at the beginning of the year, the middle and the end. This was expected from our data. A linear model seems to be appropriate although when looking at the residual graph there are several outliers on the negative end. This is a pattern to further explore.
+```{r}
+cols <- character(nrow(grades))
+cols[] <- "black"
+cols[grades$G3 == 0] <- "red"
+pairs(grades,col=cols)
+
+plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)",col = cols)
+abline(h=0,col = "red")
+```
+Based on the graphs above we are able to explain the data points that go against the trend of our data. The points in red represent students who got a 0 for there end of the year grade. We can assume those people dropped out after G1 or G2 was reported.
+
+Modifying Data From Categorical to Representation by Numbers
+```{r}
+data2 <- data %>% mutate(address = case_when(address == "U"~ 0,TRUE ~ 1),
+                         famsup = case_when(famsup == "no"~0,TRUE~1),
+                         higher = case_when(higher == "yes"~ 0, higher == "no" ~ 1),
+                         internet = case_when(internet == "yes" ~ 0, internet == "no" ~ 1),
+                         famsize = case_when(famsize == "GT3" ~ 0, famsize == "LE3" ~ 1),
+                         Pstatus = case_when(Pstatus == "A" ~ 0, famsize == "T" ~ 1),
+                         romantic = case_when(romantic == "no" ~ 0, romantic=="yes" ~ 1))%>%
+  rename(motherEduation = Medu, fatherEduation = Fedu, parentalStatus=Pstatus)
+data2
+```
+
+```{r}
+data2 %>% 
+  ggplot(aes(x=sex, y=G3,fill=sex)) + 
+    geom_boxplot() +
+  ggtitle("Final Grades Based On Gender")+
+  xlab("Gender(F=Female,M=Male)")+
+  ylab("End Of Year Grade")
+```
+We see that on average males performed better in the math course over females. Being a male is more likely to lead to higher grades.
+
+```{r}
+data %>%
+  ggplot(aes(x=famsup, y=G3,fill=famsup)) + 
+    geom_boxplot() +
+  ggtitle("Final Grades Based On Family Education Support")+
+  xlab("Recieved Family Education Support")+
+  ylab("End Of Year Grade")
+```
+This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Are boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. These being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
+
+```{r}
+data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
+                                      studytime == 2 ~ "15 to 30 min",
+                                      studytime == 3 ~ "30 min. to 1 hour",
+                                      TRUE ~ ">1 hour")) %>%
+  ggplot(aes(x=reorder(studytime,G3,na.rm = TRUE), y=G3,fill=studytime)) + 
+    geom_boxplot() +
+  ggtitle("Final Grades Based Weekly Study Time")+
+  xlab("Weekly Study Time")+
+  ylab("End Of Year Grade")
+```
+When looking at this graph we observe that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
+
+
+
+
