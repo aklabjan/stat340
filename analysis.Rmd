@@ -84,7 +84,7 @@ data %>%
   xlab("Recieved Family Education Support")+
   ylab("End Of Year Grade")
 ```
-This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Are boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. These being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
+This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Our boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. This being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
 
 ```{r}
 data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
@@ -97,7 +97,7 @@ data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
   xlab("Weekly Study Time")+
   ylab("End Of Year Grade")
 ```
-When looking at this graph we observe that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
+When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
 
 
 
