@@ -12,7 +12,7 @@ chunk_output_type: inline
 
 ```{r}
 library(tidyverse)
-library(ggplot2)
+#library(ggplot2) This is not necessary, ggplot2 is included in tidyverse
 data <- read.csv("student-mat.csv")
 data
 ```
@@ -99,6 +99,49 @@ data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
 ```
 When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
 
+__Analysis of Students who Dropped__
+```{r}
+drop <- data %>%
+  mutate(drop = case_when(
+    G3 == 0 ~ TRUE,
+    G3 > 0 ~ FALSE
+  ),G1=G1/20,G2=G2/20,G3=G3/20)
+```
+We know there is a correlation between G1, G2, and G3. How do previous grades affect a student's decision to drop?
+```{r}
+drop %>%
+  filter(drop == TRUE) %>%
+  ggplot(aes(G1)) +
+  geom_bar() +
+  xlab("First period grade in percentage") +
+  ylab("Count") +
+  ggtitle("First period grades among dropped students")
 
+drop %>%
+  filter(drop == TRUE & G2 == 0) %>%
+  ggplot(aes(G1)) +
+  geom_bar() +
+  xlab("First period grade in percentage") +
+  ylab("Count") +
+  ggtitle("First period grades among students who dropped during the second period")
+```
 
+From these two graphs, we can see that among those who dropped at some point in the class, none of them were able to obtain a score higher than ~60%. Now, how does that relate to students who did not drop?
 
+```{r}
+drop %>%
+  filter(drop==FALSE) %>%
+  ggplot(aes(G1)) +
+  geom_bar() +
+  xlab("First period grade in percentage") +
+  ylab("Count") +
+  ggtitle("First period grades among students who did not drop")
+
+drop %>%
+  filter(drop==FALSE) %>%
+  summarize(mean=mean(G1))
+```
+
+Compared to students who did not drop the class, we see a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
+
+__ANALYSIS OF OTHER SIGNIFICANT FACTORS FOUND IN PREVIOUS PARTS OF REPORT__
