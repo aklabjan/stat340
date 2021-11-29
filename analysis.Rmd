@@ -18,8 +18,9 @@ The data set describes final grades of students and provides a multitude of vari
 
 ```{r,warning=FALSE}
 library(tidyverse)
+library(formattable)
 data <- read.csv("student-mat.csv")
-head(data,10)
+head(data,3)
 ```
 
 
@@ -73,8 +74,8 @@ head(drop,3)
 We know there is a correlation between G1, G2, and G3 but can we find a pattern to the students who dropped out? Can G1 grades be used to predict which students dropped out? Are there potentially other facts? 
 
 ```{r}
-drop %>% group_by(dropped) %>% count()
-38/(357+38)
+drop %>% group_by(dropped) %>% summarise(count = n()) %>%
+  mutate(freq = formattable::percent(count / sum(count)))
 ```
 
 These questions are important to ask since if we can identify which students are most likely to drop out then analysis can be done on future students and those students who are most likely in danger of dropping out can receive access and resources to additional assistance. This is especially important to our data set when the Portuguese are trying to improve there student failure rate in core classes. Our data set shows that at the time of data collection there was about a 10% drop out rate which is very high. 
@@ -130,6 +131,7 @@ data2 %>%
   xlab("Gender(F=Female,M=Male)")+
   ylab("End Of Year Grade")
 ```
+
 We see that on average males performed better in the math course over females. Being a male is more likely to lead to higher grades.
 
 ```{r}
@@ -140,6 +142,7 @@ data %>%
   xlab("Recieved Family Education Support")+
   ylab("End Of Year Grade")
 ```
+
 This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Our boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. This being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
 
 ```{r}
@@ -153,4 +156,5 @@ data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
   xlab("Weekly Study Time")+
   ylab("End Of Year Grade")
 ```
+
 When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
