@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Maths Grades Analysis"
 output:
   html_document:
     df_print: paged
@@ -9,13 +9,19 @@ editor_options:
   chunk_output_type: inline
 chunk_output_type: inline
 ---
-
-```{r}
-library(tidyverse)
-#library(ggplot2) This is not necessary, ggplot2 is included in tidyverse
-data <- read.csv("student-mat.csv")
-data
+```{r,echo=FALSE}
+Name <- c("Annabelle Griffith-Topps","Jake White","Bryan Li","Ana Klabjan","Zi Hern Wong","Jacob Larget")
+NetID <- c("griffithtopp","jtwhite4","bli378","aklabjan","zwong4","jlarget")
+data.frame(Name,NetID)
 ```
+The data set describes final grades of students and provides a multitude of variables that could correlate with student performance. We found that this data set provided an extensive amount of information about student’s backgrounds that could hypothetically impact grades, and as students, we thought it could be insightful and allow us to do an in depth analysis of the data. 
+
+```{r,warning=FALSE}
+library(tidyverse)
+data <- read.csv("student-mat.csv")
+head(data,10)
+```
+
 
 ```{r}
 grades <- data %>% select(G1,G2,G3)
@@ -25,7 +31,7 @@ cor(grades)
 ```{r}
 lmG1 <- lm(G3~G1,data = grades)
 lmG2 <- lm(G3~G2,data = grades)
-pc <- prcomp(grades, scale=TRUE)
+pc <- prcomp(grades[,c(1,2)], scale=TRUE)
 lm <- lm(grades$G3 ~ pc$x[,1])
 summary(lmG1)
 summary(lmG2)
@@ -53,7 +59,56 @@ abline(h=0,col = "red")
 ```
 Based on the graphs above we are able to explain the data points that go against the trend of our data. The points in red represent students who got a 0 for there end of the year grade. We can assume those people dropped out after G1 or G2 was reported.
 
-Modifying Data From Categorical to Representation by Numbers
+__Analysis of Students Who Dropped__
+```{r}
+drop <- data %>%
+  mutate(dropped = case_when(
+    G3 == 0 ~ TRUE,
+    G3 > 0 ~ FALSE),
+    G1=G1/20,G2=G2/20,G3=G3/20) %>%
+  select(dropped,G1,G2,G3,everything())
+head(drop,3)
+```
+
+We know there is a correlation between G1, G2, and G3 but can we find a pattern to the students who dropped out? Can G1 grades be used to predict which students dropped out? Are there potentially other facts? 
+
+```{r}
+drop %>% group_by(dropped) %>% count()
+38/(357+38)
+```
+
+These questions are important to ask since if we can identify which students are most likely to drop out then analysis can be done on future students and those students who are most likely in danger of dropping out can receive access and resources to additional assistance. This is especially important to our data set when the Portuguese are trying to improve there student failure rate in core classes. Our data set shows that at the time of data collection there was about a 10% drop out rate which is very high. 
+
+```{r}
+drop %>%
+  filter(drop == TRUE) %>%
+  ggplot(aes(G1)) +
+  geom_bar() +
+  xlab("First Period Grade in Percentage") +
+  ylab("Student Count") +
+  ggtitle("First Period Grades Among Students Who Dropped")
+```
+
+From these two graphs, we can see that among those who dropped at some point in the class, none of them were able to obtain a score higher than ~60%. Now, how does that relate to students who did not drop?
+
+```{r}
+ggplot(drop, aes(x=G1, fill=dropped)) +
+  geom_density(alpha=.25) +
+  xlab("First Period Grade in Percentage") +
+  ylab("Density") +
+  ggtitle("First Period Grade Density By Dropped Out")
+
+ggplot(drop,aes(x=dropped, y=G1,fill=dropped)) + 
+  geom_boxplot() +
+  ggtitle("First Period Grade Distribution by Dropped Out")+
+  xlab("Students Dropped Out By End of Year")+
+  ylab("First Period Grade in Percentage")
+```
+Compared to students who did not drop the class, we see a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
+
+
+
+__Modifying Data From Categorical to Representation by Numbers__
 ```{r}
 data2 <- data %>% mutate(address = case_when(address == "U"~ 0,TRUE ~ 1),
                          famsup = case_when(famsup == "no"~0,TRUE~1),
@@ -66,6 +121,7 @@ data2 <- data %>% mutate(address = case_when(address == "U"~ 0,TRUE ~ 1),
 data2
 ```
 
+__Analysis of Factors That May Impact Final Grade Prediction__
 ```{r}
 data2 %>% 
   ggplot(aes(x=sex, y=G3,fill=sex)) + 
@@ -98,50 +154,3 @@ data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
   ylab("End Of Year Grade")
 ```
 When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
-
-__Analysis of Students who Dropped__
-```{r}
-drop <- data %>%
-  mutate(drop = case_when(
-    G3 == 0 ~ TRUE,
-    G3 > 0 ~ FALSE
-  ),G1=G1/20,G2=G2/20,G3=G3/20)
-```
-We know there is a correlation between G1, G2, and G3. How do previous grades affect a student's decision to drop?
-```{r}
-drop %>%
-  filter(drop == TRUE) %>%
-  ggplot(aes(G1)) +
-  geom_bar() +
-  xlab("First period grade in percentage") +
-  ylab("Count") +
-  ggtitle("First period grades among dropped students")
-
-drop %>%
-  filter(drop == TRUE & G2 == 0) %>%
-  ggplot(aes(G1)) +
-  geom_bar() +
-  xlab("First period grade in percentage") +
-  ylab("Count") +
-  ggtitle("First period grades among students who dropped during the second period")
-```
-
-From these two graphs, we can see that among those who dropped at some point in the class, none of them were able to obtain a score higher than ~60%. Now, how does that relate to students who did not drop?
-
-```{r}
-drop %>%
-  filter(drop==FALSE) %>%
-  ggplot(aes(G1)) +
-  geom_bar() +
-  xlab("First period grade in percentage") +
-  ylab("Count") +
-  ggtitle("First period grades among students who did not drop")
-
-drop %>%
-  filter(drop==FALSE) %>%
-  summarize(mean=mean(G1))
-```
-
-Compared to students who did not drop the class, we see a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
-
-__ANALYSIS OF OTHER SIGNIFICANT FACTORS FOUND IN PREVIOUS PARTS OF REPORT__
