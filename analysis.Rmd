@@ -146,11 +146,21 @@ data %>%
 This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Our boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. This being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
 
 ```{r}
+# data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
+#                                       studytime == 2 ~ "15 to 30 min",
+#                                       studytime == 3 ~ "30 min. to 1 hour",
+#                                       TRUE ~ ">1 hour")) %>%
+#   ggplot(aes(x=reorder(studytime,G3,na.rm = TRUE), y=G3,fill=studytime)) + 
+#     geom_boxplot() +
+#   ggtitle("Final Grades Based Weekly Study Time")+
+#   xlab("Weekly Study Time")+
+#   ylab("End Of Year Grade")
+
 data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
-                                      studytime == 2 ~ "15 to 30 min",
-                                      studytime == 3 ~ "30 min. to 1 hour",
-                                      TRUE ~ ">1 hour")) %>%
-  ggplot(aes(x=reorder(studytime,G3,na.rm = TRUE), y=G3,fill=studytime)) + 
+                                      studytime == 2 ~ "<30 min",
+                                      studytime == 3 ~ "<60 min",
+                                      TRUE ~ "<60+ min")) %>% 
+  ggplot(aes(x=studytime, y=G3,fill=studytime)) + 
     geom_boxplot() +
   ggtitle("Final Grades Based Weekly Study Time")+
   xlab("Weekly Study Time")+
