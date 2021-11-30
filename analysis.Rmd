@@ -14,7 +14,7 @@ Name <- c("Annabelle Griffith-Topps","Jake White","Bryan Li","Ana Klabjan","Zi H
 NetID <- c("griffithtopp","jtwhite4","bli378","aklabjan","zwong4","jlarget")
 data.frame(Name,NetID)
 ```
-The data set describes final grades of students and provides a multitude of variables that could correlate with student performance. We found that this data set provided an extensive amount of information about student’s backgrounds that could hypothetically impact grades, and as students, we thought it could be insightful and allow us to do an in depth analysis of the data. 
+The data set describes final grades of students and provides a multitude of variables that could correlate with student performance. We found that this data set provided an extensive amount of information about student’s backgrounds that could hypothetically impact grades, and as students, we thought it could be insightful and allow us to do an in-depth analysis of the data. 
 
 ```{r,warning=FALSE}
 library(tidyverse)
@@ -58,7 +58,7 @@ pairs(grades,col=cols)
 plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)",col = cols)
 abline(h=0,col = "red")
 ```
-Based on the graphs above we are able to explain the data points that go against the trend of our data. The points in red represent students who got a 0 for there end of the year grade. We can assume those people dropped out after G1 or G2 was reported.
+Based on the graphs above we are able to explain the data points that go against the trend of our data. The points in red represent students who got a 0 for their end of the year grade. We can assume those people dropped out after G1 or G2 was reported.
 
 __Analysis of Students Who Dropped__
 ```{r}
@@ -71,7 +71,7 @@ drop <- data %>%
 head(drop,3)
 ```
 
-We know there is a correlation between G1, G2, and G3 but can we find a pattern to the students who dropped out? Can G1 grades be used to predict which students dropped out? Are there potentially other facts? 
+We know there is a correlation between G1, G2, and G3, but can we find a pattern to the students who dropped out? Can G1 grades be used to predict which students dropped out? Are there potentially other factors? 
 
 ```{r}
 drop %>% group_by(dropped) %>% summarise(count = n()) %>%
@@ -157,4 +157,24 @@ data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
   ylab("End Of Year Grade")
 ```
 
-When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course. 
+When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course.
+
+```{r}
+data_onehot = data %>%
+  mutate(m_sex = case_when(
+  sex == "M" ~ 1,
+  sex == "F" ~ 0)) %>%
+  select(-sex) %>%
+  mutate(study15 = case_when(
+  studytime == 1 ~ 1,
+  TRUE ~ 0)) %>%
+  mutate(study30 = case_when(
+  studytime == 2 ~ 1,
+  TRUE ~ 0)) %>%
+  mutate(study60 = case_when(
+  studytime == 3 ~ 1,
+  TRUE ~ 0)) %>% 
+  mutate(study60_plus = case_when(
+  studytime == 4 ~ 1,
+  TRUE ~ 0)) %>% select(-studytime)
+```
