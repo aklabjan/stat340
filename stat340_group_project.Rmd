@@ -1,0 +1,173 @@
+---
+title: "Maths Grades Analysis"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+editor_options:
+  chunk_output_type: inline
+chunk_output_type: inline
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(formattable)
+```
+
+```{r intro,echo=FALSE}
+Name <- c("Annabelle Griffith-Topps","Jake White","Bryan Li","Ana Klabjan","Zi Hern Wong","Jacob Larget")
+NetID <- c("griffithtopp","jtwhite4","bli378","aklabjan","zwong4","jlarget")
+data.frame(Name,NetID)
+```
+
+# Introduction
+
+Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer two statistical questions: (1) How accurately can we determine whether a student will drop out by the end of the semester based on their demographic information, and (2) How accurately can we determine a student's final semester grade, given that they did not drop out of school?
+
+```{r,warning=FALSE}
+data <- read.csv("student-mat.csv")
+head(data,3)
+```
+
+We came to these questions after some exploratory data analysis where we realized that dropping out resulted in clustering that ran counter to our otherwise confirmed expectation that grades are highly correlated with each other within a given student and semester.
+
+```{r}
+grades = data %>% select(G1,G2,G3)
+cols <- character(nrow(grades))
+cols[] <- "black"
+cols[grades$G3 == 0] <- "red"
+pairs(grades,col=cols)
+cor(grades)
+```
+
+
+# Q1: Modeling Student Drop Out Behavior
+
+```{r}
+data1 = data %>% mutate(dropped = case_when(
+  G3 == 0 ~ 1,
+  TRUE ~ 0
+)) %>% select(-G1,-G2,-G3)
+
+#data1
+```
+```{r warning=FALSE, results=FALSE}
+# model creation
+m1 = glm(dropped~.,data1, family = "binomial")
+m1_AIC = step(m1, scope=dropped~.)
+```
+
+```{r warning=FALSE}
+summary(m1)
+summary(m1_AIC)
+```
+
+```{r warning=FALSE}
+# model analysis
+sum(residuals(m1)^2)
+sum(residuals(m1_AIC)^2)
+# source: https://astrostatistics.psu.edu/su07/R/html/stats/html/extractAIC.html
+# output = (equivalent degrees of freedom, generalized Akaike Information Criterion)
+extractAIC(m1)
+extractAIC(m1_AIC)
+plot(m1, which = 2)
+plot(m1_AIC, which = 2)
+```
+
+At a glance, here are the boxplots/distributions of the variables isolated by our best model as the most important.
+
+TODO
+
+
+# Q2: Modeling Completing Students' Semester Performance
+
+```{r}
+# this is the subset of data that describes completing students' demographics 
+data2 = data %>% filter(G3 != 0) %>% select(-G1,-G2)
+
+#data2
+```
+
+```{r, results=FALSE}
+m2 = lm(G3~.,data2)
+m2_AIC = step(m2,scope=G3~.)
+```
+
+After using R's step function to evaluate our model with respect to the deafault AIC^[https://www.r-bloggers.com/2018/04/how-do-i-interpret-the-aic/], we see the following difference in summaries. Notably, using stepwise selection with AIC has highlighted a particular subset of variables worthy of further analysis.
+
+```{r}
+summary(m2)
+summary(m2_AIC)
+```
+We can go further by considering the interactions of our variables.
+
+```{r}
+# considering a further subset of those deemed important by initial model, will now consider pairwise interactions
+data2_pw = data2 %>% select(studytime, failures, schoolsup, goout, health, absences, G3)
+
+#data2_pw
+```
+
+```{r, results=FALSE}
+m2_pw = lm(G3~(.)^2,data2_pw)
+m2_pw_AIC = step(m2_pw, scope=G3~(.)^2)
+```
+
+```{r}
+summary(m2_pw)
+summary(m2_pw_AIC)
+```
+
+```{r}
+data_final = data2_pw %>% select(-health,-goout)
+
+model_final = lm(G3~(.)^2,data_final)
+summary(model_final)
+```
+
+
+Through this progression, you can see how we were able to flatten the residual vs fitted values curve through the AIC, improving our model's predictive ability and isolating a key number of demographic features.
+
+```{r}
+plot(m2, which=1)
+plot(m2_AIC, which=1)
+plot(m2_pw, which=1)
+plot(m2_pw_AIC, which=1)
+plot(model_final, which=1)
+
+sum(residuals(m2)^2)
+sum(residuals(m2_AIC)^2)
+sum(residuals(m2_pw)^2)
+sum(residuals(m2_pw_AIC)^2)
+sum(residuals(model_final)^2)
+
+# source: https://astrostatistics.psu.edu/su07/R/html/stats/html/extractAIC.html
+# output = (equivalent degrees of freedom, generalized Akaike Information Criterion)
+extractAIC(m2)
+extractAIC(m2_AIC)
+extractAIC(m2_pw)
+extractAIC(m2_pw_AIC)
+extractAIC(model_final)
+```
+
+
+At a glance, here are the boxplots/distributions of the variables isolated by our best model as the most important.
+
+TODO
+
+***
+Next Steps:
+
+1. Figure out a good way to further improve our logistic regression model, as pairwise comparison clearly made it worse (it made a negative AIC, which makes sense when you consider next step 5)
+
+2. Better understand how the value of our models refers to the numbers themselves instead of their relative value to worse, initial models (why exactly is plot(m, which=1) a bad visualization of m1s?)
+
+3. Create boxplots/distributions of variables isolated by the best model as the most important (is it clear from these the relative strength of our important variables?).
+
+4. Use jackknifing to find a better way to analyze prediction strength through test and training data splits (extension of next step 2, can we get closer, and how do we know if we are?)
+
+5. Explain the validity of minimizing AIC to compare model strength (might ANOVA find different significant factors?)
+
+6. Strengthen confidence in having found global minimum despite greedy approach by starting the model off in a disparate area of the model space (like G3~1 or dropped~1?).
