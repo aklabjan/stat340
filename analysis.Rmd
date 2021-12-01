@@ -116,6 +116,20 @@ The data comes from schools in Portugal through school records as well as questi
 
 One considerable challenge we faced so far was finding a sufficient dataset to answer statistical questions. A common issue we ran across was finding a balance between dataset size and content of the data. We came to an understanding that our data needed to have variables that shared a mix of binary and numeric values to answer questions that regarded estimation and prediction. Finding a dataset with enough variables to analyze relationships between was also a necessity. Our initial approach of using pairs plots to view relationships between variables ended up being insufficient due to the large number of variables we are analyzing together. To solve this problem, we decided to take an enhanced view at select variables. We felt that in doing so, our statistical questions will be answered with greater accuracy. 
 
+Next Steps:
+
+1. Figure out a good way to further improve our logistic regression model, as pairwise comparison clearly made it worse (it made a negative AIC, which makes sense when you consider next step 5)
+
+2. Better understand how the value of our models refers to the numbers themselves instead of their relative value to worse, initial models (why exactly is plot(m, which=1) a bad visualization of m1s?)
+
+3. Create boxplots/distributions of variables isolated by the best model as the most important (is it clear from these the relative strength of our important variables?).
+
+4. Use jackknifing to find a better way to analyze prediction strength through test and training data splits (extension of next step 2, can we get closer, and how do we know if we are?)
+
+5. Explain the validity of minimizing AIC to compare model strength (might ANOVA find different significant factors?)
+
+6. Strengthen confidence in having found global minimum despite greedy approach by starting the model off in a disparate area of the model space (like G3~1 or dropped~1?).
+
 ```{r,warning=FALSE}
 library(tidyverse)
 library(formattable)
@@ -295,7 +309,7 @@ data_onehot = data %>%
   TRUE ~ 0)) %>% select(-studytime)
 ```
 
-__Initial Models__
+__Initial Model Analysis__
 
 # Q1: Modeling Student Drop Out Behavior
 
