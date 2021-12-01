@@ -64,8 +64,8 @@ __Analysis of Students Who Dropped__
 ```{r}
 drop <- data %>%
   mutate(dropped = case_when(
-    G3 == 0 ~ TRUE,
-    G3 > 0 ~ FALSE),
+    G3 == 0 ~ 1,
+    G3 > 0 ~ 0),
     G1=G1/20,G2=G2/20,G3=G3/20) %>%
   select(dropped,G1,G2,G3,everything())
 head(drop,3)
@@ -82,7 +82,7 @@ These questions are important to ask since if we can identify which students are
 
 ```{r}
 drop %>%
-  filter(drop == TRUE) %>%
+  filter(dropped == 1) %>%
   ggplot(aes(G1)) +
   geom_bar() +
   xlab("First Period Grade in Percentage") +
@@ -93,13 +93,13 @@ drop %>%
 From these two graphs, we can see that among those who dropped at some point in the class, none of them were able to obtain a score higher than ~60%. Now, how does that relate to students who did not drop?
 
 ```{r}
-ggplot(drop, aes(x=G1, fill=dropped)) +
+ggplot(drop, aes(x=G1, group=dropped, fill=dropped)) +
   geom_density(alpha=.25) +
   xlab("First Period Grade in Percentage") +
   ylab("Density") +
   ggtitle("First Period Grade Density By Dropped Out")
 
-ggplot(drop,aes(x=dropped, y=G1,fill=dropped)) + 
+ggplot(drop,aes(x=dropped, y=G1,group=dropped,fill=dropped)) + 
   geom_boxplot() +
   ggtitle("First Period Grade Distribution by Dropped Out")+
   xlab("Students Dropped Out By End of Year")+
@@ -107,7 +107,13 @@ ggplot(drop,aes(x=dropped, y=G1,fill=dropped)) +
 ```
 Compared to students who did not drop the class, we see a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
 
-
+```{r}
+predictDropOut <- glm(dropped~G1, data=drop, family="binomial")
+summary(predictDropOut)
+predict(predictDropOut, newdata=data.frame(G1=0.35), type="response")
+```
+We see that G1 is statistically significant at predicting if a student will drop out or not. 
+Based on the first graph we see the averaged drop out grade seems to be around 35% when putting that into our model we get that our predicted percentage of dropping out is 24%. I was expecting this value to be higher. Maybe other factors can be included for a better prediction. Also how does the distribution of percentages look for our data?
 
 __Modifying Data From Categorical to Representation by Numbers__
 ```{r}
