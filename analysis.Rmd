@@ -295,6 +295,8 @@ data_onehot = data %>%
   TRUE ~ 0)) %>% select(-studytime)
 ```
 
+__Initial Models__
+
 # Q1: Modeling Student Drop Out Behavior
 
 ```{r}
@@ -327,11 +329,6 @@ extractAIC(m1_AIC)
 plot(m1, which = 2)
 plot(m1_AIC, which = 2)
 ```
-
-At a glance, here are the boxplots/distributions of the variables isolated by our best model as the most important.
-
-TODO
-
 
 # Q2: Modeling Completing Students' Semester Performance
 
@@ -403,17 +400,3 @@ extractAIC(m2_pw)
 extractAIC(m2_pw_AIC)
 extractAIC(model_final)
 ```
-***
-Next Steps:
-
-1. Figure out a good way to further improve our logistic regression model, as pairwise comparison clearly made it worse (it made a negative AIC, which makes sense when you consider next step 5)
-
-2. Better understand how the value of our models refers to the numbers themselves instead of their relative value to worse, initial models (why exactly is plot(m, which=1) a bad visualization of m1s?)
-
-3. Create boxplots/distributions of variables isolated by the best model as the most important (is it clear from these the relative strength of our important variables?).
-
-4. Use jackknifing to find a better way to analyze prediction strength through test and training data splits (extension of next step 2, can we get closer, and how do we know if we are?)
-
-5. Explain the validity of minimizing AIC to compare model strength (might ANOVA find different significant factors?)
-
-6. Strengthen confidence in having found global minimum despite greedy approach by starting the model off in a disparate area of the model space (like G3~1 or dropped~1?).
