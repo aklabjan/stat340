@@ -367,3 +367,18 @@ extractAIC(m2_pw)
 extractAIC(m2_pw_AIC)
 extractAIC(model_final)
 ```
+
+All together, you can see as we progress from our initial red model to our final purple model, the curve flattens without overfitting.
+
+```{r}
+library(ggplot2)
+ggplot() +
+  geom_hline(yintercept=0, linetype=2, color = "black") + 
+  # points removed as they force worse scaling
+  # geom_point(data=m2, aes(x=.fitted, y =.resid), color = "red", alpha = 0.1) +
+  geom_smooth(data=m2, aes(x=.fitted, y =.resid), se=FALSE, color = "red", linetype = "twodash") +
+  geom_smooth(data=m2_AIC, aes(x=.fitted, y =.resid), se=FALSE, color = "orange", linetype = "dotdash") +
+  geom_smooth(data=m2_pw, aes(x=.fitted, y =.resid), se=FALSE, color = "green", linetype = "dashed") +
+  geom_smooth(data=m2_pw_AIC, aes(x=.fitted, y =.resid), se=FALSE, color = "blue", linetype = "dotted") +
+  geom_smooth(data=model_final, aes(x=.fitted, y =.resid), se=FALSE, color = "purple", linetype = "solid")
+```
