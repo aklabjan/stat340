@@ -1,9 +1,9 @@
 ---
 title: "Maths Grades Analysis"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
   word_document: default
 editor_options:
   chunk_output_type: inline
@@ -12,6 +12,7 @@ chunk_output_type: inline
 ```{r setup,include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,warning = FALSE)
 library(tidyverse)
+library(ggplot2)
 ```
 
 ```{r,echo=FALSE}
@@ -20,12 +21,12 @@ NetID <- c("griffithtopp","jtwhite4","bli378","aklabjan","zwong4","jlarget")
 data.frame(Name,NetID)
 ```
 ## Abstract
-Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer two statistical questions: (1) What variables have an effect on weather a student will drop out or not? (2) What variables have an effect on predicting a students final grade? 
+Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer our statistical question: (1) What variables have an effect on weather a student will drop out or not?
 
 To_do: conclusion
 
 ## Data Set Introduction
-This data is important as in the case of our data Portugal they have a high failure rate in core classes compared to other European countries. If we can identify the students who are most likely to drop out after first quarter then teachers and the school systems can provide additional resources to the student. 
+This data is important as in the case of our data Portugal they have a high failure rate in core classes compared to other European countries. If we can identify the students who are most likely to drop out after first quarter then teachers and the school systems can provide additional resources to them. 
 
 The data comes from schools in Portugal through school records as well as questionnaires. This data was collected by Paulo Cortez and Alice Silva who work for the department of Information Systems/Algoritmi R&D Centre at the University of Minho. It started off as two datasets, one with student grades and another with the student questionnaire responses. It was then combined before doing analysis. This study is significant as specifically in Portugal, the proportion of students leaving class early is 40% whereas the average in the rest of the European Union is 15%. This is just one example of a statistic where Portugal is near the bottom compared to the rest of the European Union. Pinpointing a few of these factors could help officials develop a solution to improve Portugal’s educational performance.
 
@@ -121,7 +122,6 @@ If a student has poor health, they might stay home from school more and have to 
 __absences__ - number of school absences (numeric: from 0 to 93)
 The number of absences can correlate with student performance.
 
-
 ```{r,warning=FALSE}
 library(tidyverse)
 library(formattable)
@@ -129,42 +129,42 @@ data <- read.csv("student-mat.csv")
 head(data,3)
 ```
 
-We choose our two questions after some exploratory data analysis where we realized that dropping out resulted in clustering that ran counter to our otherwise confirmed expectation that grades are highly correlated with each other within a given student and semester.
-
-When we first started we ran a pairs plot on our data just based on grades we noticed there was a distinct pattern of several data points in a line that didn't fit the trend of the rest of the data. We indicated these data points in red.
+# Background
+We started off our research with basic exploratory data analysis. We knew that the focus of our report would have a question that has a response variable related to grades when modeled. We ran a pairs plot on G1, G2 and G3 when we noticed there was a distinct pattern of several data points in a line that didn't fit our expected outcome: a strong positive linear correlation between G1, G2 and G3. We indicated these data points in red.
 ```{r}
 grades <- data %>% select(G1,G2,G3)
 cols <- character(nrow(grades))
 cols[] <- "black"
 cols[grades$G3 == 0] <- "red"
 pairs(grades,col=cols)
-cor(grades)
 ```
-We noticed that there is a strong linear correlation between G1, G2 and G3 grades. We also were able to come to the conclusion that the outlier data points represented students who dropped out of school before the end of the year. The trend lead us to the creation of our first question. 
-
-# Q1: Modeling Student Drop Out Behavior
-
-Transformed data by adding column to indicate if the student dropped out or not.
+The coloring in the plot was determined by if the G3 column in our data set was equal to zero. The red points represent students who dropped out of the class before the end of the year. This trend lead us to the focus of our report: What variables have an effect on weather a student will drop out?
 ```{r}
 drop <- data %>%
   mutate(dropped = case_when(
     G3 == 0 ~ 1,
     G3 > 0 ~ 0),
-    G1=G1/20,G2=G2/20,G3=G3/20) %>%
-  select(dropped,G1,G2,G3,everything())
-head(drop,3)
+    G1=G1/20,G2=G2/20,G3=G3/20,
+    completedCourse = case_when(
+    G3 == 0 ~ FALSE,
+    G3 > 0 ~ TRUE)
+    ) %>%
+  select(dropped,completedCourse,G1,G2,G3,everything())
 ```
 
-What variables have an effect on weather a student will drop out?
-
+This question is important to ask since if we can identify which students are most likely to drop out then analysis can be done on future students and those students who are predicted to be most likely in danger of dropping out can receive access to additional resources and assistance. This is especially important to our data set when the Portuguese are trying to improve there student failure rate in core classes. Our data set shows that at the time of data collection there was about a 10% drop out rate which is very high. 
 ```{r}
-drop %>% group_by(dropped) %>% summarise(count = n()) %>%
+drop %>% group_by(completedCourse) %>% summarise(count = n()) %>%
   mutate(freq = formattable::percent(count / sum(count)))
 ```
 
-This question is important to ask since if we can identify which students are most likely to drop out then analysis can be done on future students and those students who are most likely in danger of dropping out can receive access and resources to additional assistance. This is especially important to our data set when the Portuguese are trying to improve there student failure rate in core classes. Our data set shows that at the time of data collection there was about a 10% drop out rate which is very high. 
-
+# Report
+We started off by transforming our data and adding two columns "dropped" and "completedCourse". "dropped" and "completedCourse" were equivalent in meaning, whether a student ended with a final grade,G3, of zero indicating they dropped out and did not complete the course. G1, G2, and G3 were transformed into percentage values with 20 being the highest possible grade.
 ```{r}
+head(drop,3)
+```
+
+```{r,include=FALSE}
 drop %>%
   filter(dropped == 1) %>%
   ggplot(aes(G1)) +
@@ -174,17 +174,21 @@ drop %>%
   ggtitle("First Period Grades Among Students Who Dropped")
 ```
 
+DELETE
 From these two graphs, we can see that among those who dropped at some point in the class, none of them were able to obtain a score higher than ~60%. Now, how does that relate to students who did not drop?
 
-```{r}
-ggplot(drop, aes(x=G1, group=dropped, fill=dropped)) +
+```{r,include=FALSE}
+ggplot(drop, aes(x=G1, group=completedCourse, fill=completedCourse)) +
   geom_density(alpha=.25) +
   xlab("First Period Grade in Percentage") +
   ylab("Density") +
   ggtitle("First Period Grade Density By Dropped Out")
+```
 
-ggplot(drop,aes(x=dropped, y=G1,group=dropped,fill=dropped)) + 
-  geom_boxplot() +
+
+```{r}
+ggplot(drop, aes(x=completedCourse, y=G1)) + 
+  geom_violin(trim=FALSE) +
   ggtitle("First Period Grade Distribution by Dropped Out")+
   xlab("Students Dropped Out By End of Year")+
   ylab("First Period Grade in Percentage")
@@ -192,7 +196,7 @@ ggplot(drop,aes(x=dropped, y=G1,group=dropped,fill=dropped)) +
 Compared to students who did not drop the class, we see a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
 
 Now lets create a model with dropped as the response variable and G1 grade as the explanatory variable. 
-```{r}
+```{r,include=FALSE}
 predictDropOut <- glm(dropped~G1, data=drop, family="binomial")
 summary(predictDropOut)
 predict(predictDropOut, newdata=data.frame(G1=0.35), type="response")
@@ -200,185 +204,61 @@ predict(predictDropOut, newdata=data.frame(G1=0.35), type="response")
 We see that G1 is statistically significant at predicting if a student will drop out or not. 
 Based on the first graph we see the averaged drop out grade seems to be around 35% when putting that into our model we get that our predicted percentage of dropping out is 24%. I was expecting this value to be higher. Maybe other factors can be included for a better prediction. Also how does the distribution of percentages look for our data?
 
-
-```{r}
-data1 = data %>% mutate(dropped = case_when(
-  G3 == 0 ~ 1,
-  TRUE ~ 0
-)) %>% select(-G1,-G2,-G3)
-
+We created a model with dropped as response and everything else in our datas et as the explanatory variables.
+```{r warning=FALSE, results=FALSE}
+drop2 = drop %>% select(-G2,-G3,-completedCourse)
+# model creation
+m1 = glm(dropped~.,drop2, family = "binomial")
+m1_AIC = step(m1, scope=dropped~.)
 ```
 
-We created a model with dropped as response and everything else in our dataset as the explanatory variables.
-```{r warning=FALSE, results=FALSE}
-# model creation
-m1 = glm(dropped~.,data1, family = "binomial")
-
-m1_AIC = step(m1, scope=dropped~.)
+```{r,include=FALSE}
+# dont show 
 summary(m1)
 sum(residuals(m1)^2)
 extractAIC(m1)
 ```
+
+TO-DO: TALK ABOUT WHAT WE DID(DON'T SHOW) AND WHY
+
 This model has health, weekend drinking, past class failures, mother's education, age and school as being statistically significant when it comes to weather a student will drop out or not. This model has a degrees of freedom of 40 and AIC of 144.67 and RSS 64.67.
 
 We improved the model by using stepwise selection according to AIC.
 ```{r}
 summary(m1_AIC)
-sum(residuals(m1_AIC)^2)
+#sum(residuals(m1_AIC)^2)
 # source: https://astrostatistics.psu.edu/su07/R/html/stats/html/extractAIC.html
 # output = (equivalent degrees of freedom, generalized Akaike Information Criterion)
-extractAIC(m1_AIC)
+#extractAIC(m1_AIC)
 ```
 This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant weather someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.
 
+Based on our current knowledge we are not sure as to which model is better between the two as the first has a lower RSS although not by much so on the other hand the second model has better statistics from the extractAIC with a lower degrees of freedom and  generalized Akaike Information Criterion. We are certain that school, age, past class failure and weekend drinking are all important factors in being able to predict if a student will drop out or not as they were marked as significant in both models we created. Health, mother's education, family size, attending nursery school and romantic partner were significant explanatory variables in one model but not the other. At this moment we aren't able to explain why some variable are significant in one model but not in the other. Further testing would need to be performed on this additional variables to determine if they are significant explanatory variables to predicting weather a student will drop out or not. 
 
-
-# Q2: Modeling Completing Students' Semester Performance
-
-
-```{r}
-lmG1 <- lm(G3~G1,data = grades)
-lmG2 <- lm(G3~G2,data = grades)
-pc <- prcomp(grades[,c(1,2)], scale=TRUE)
-lm <- lm(grades$G3 ~ pc$x[,1])
-summary(lmG1)
-summary(lmG2)
-summary(lm)
-```
+In conclusion, based on our analysis, all students who dropped out had a first grade of 60% or below with the median being around 30%. In addition to using G1 grade to determine if a student is likely to drop out school, age, past class failure and weekend drinking were found to also be significant in its influence weather a student is predicted to drop out. 
 
 ```{r}
-sum(residuals(lm)^2)
-sum(residuals(lmG1)^2)
-sum(residuals(lmG2)^2)
+library(rpart)
+test_inds <- sample(1:nrow(drop2), nrow(drop2)/5);
+drop.test <- drop2[test_inds,];
+drop.train <- drop2[-test_inds,];
+rt <- rpart(dropped~., data=drop.train, method='anova')
+plot(rt, uniform=TRUE, main='Regression tree for Droppping Out')
+text(rt, all=TRUE, use.n = TRUE, cex=.8 )
+
+rt
 ```
 ```{r}
-plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)")
-abline(h=0,col = "red")
-```
-There seems to be a strong correlation between the grades students had at the beginning of the year, the middle and the end. This was expected from our data. A linear model seems to be appropriate although when looking at the residual graph there are several outliers on the negative end. This is a pattern to further explore.
-```{r}
-plot(residuals(lm),xlab="Data Entry Index", ylab="Residual of Lm(G3~PC1)",col = cols)
-abline(h=0,col = "red")
-```
-Based on the graphs above we are able to explain the data points that go against the trend of our data. The points in red represent students who got a 0 for their end of the year grade. We can assume those people dropped out after G1 or G2 was reported.
-
-```{r}
-data2 = data %>% filter(G3 != 0) %>% select(-G1,-G2)
-data2 %>% 
-  ggplot(aes(x=sex, y=G3,fill=sex)) + 
-    geom_boxplot() +
-  ggtitle("Final Grades Based On Gender")+
-  xlab("Gender(F=Female,M=Male)")+
-  ylab("End Of Year Grade")
+yhat_test <-predict( rt,drop.test);
+test_resids <- yhat_test - drop.test$dropped; # compute the residuals
+# Now square them and take the mean to get MSE.
+# Note that if we just computed the RSS (i.e., no mean, just a sum), it would be
+# harder to directly compare to the test set, which is of a different size.
+mean(test_resids^2)
 ```
 
-We see that on average males performed better in the math course over females. Being a male is more likely to lead to higher grades.
+# Conclusion
 
-```{r}
-data %>%
-  ggplot(aes(x=famsup, y=G3,fill=famsup)) + 
-    geom_boxplot() +
-  ggtitle("Final Grades Based On Family Education Support")+
-  xlab("Recieved Family Education Support")+
-  ylab("End Of Year Grade")
-```
-
-This was surprising as we would have assumed if students received help at home they would receive higher grades due to that extra assistants. Our boxplot shows that both groups have the same average grade. The students who didn't receive help had a greater variety in Q3 and The students who did receive help on the other hand had greater variety in Q2. This being said we came to the conclusion that recieving help a home has minimal impact on final grades. 
-
-```{r}
-data %>% mutate(studytime = case_when(studytime == 1 ~ "<15 min",
-                                      studytime == 2 ~ "<30 min",
-                                      studytime == 3 ~ "<60 min",
-                                      TRUE ~ "<60+ min")) %>% 
-  ggplot(aes(x=studytime, y=G3,fill=studytime)) + 
-    geom_boxplot() +
-  ggtitle("Final Grades Based Weekly Study Time")+
-  xlab("Weekly Study Time")+
-  ylab("End Of Year Grade")
-```
-
-When looking at this graph we observed that as study time increases so does the average grade although overstudying can be a thing. Over an hour studying was still relatively comparable to 30min-1 hour studying by median but the lower 50 percent was spread out over a greater region on the other hand the top percentile received a higher grade then the top percentile of people who studied 30 minutes to an hour. Given this information we would say that 30 minutes to an hour is the optimal study time per week for this math course.
+TO-DO: summarize finding, further questions/exploration 
 
 
-```{r}
-# this is the subset of data that describes completing students' demographics 
-data2 = data %>% filter(G3 != 0) %>% select(-G1,-G2)
-#data2
-```
-
-```{r, results=FALSE}
-m2 = lm(G3~.,data2)
-m2_AIC = step(m2,scope=G3~.)
-```
-
-After using R's step function to evaluate our model with respect to the deafault AIC^[https://www.r-bloggers.com/2018/04/how-do-i-interpret-the-aic/], we see the following difference in summaries. Notably, using stepwise selection with AIC has highlighted a particular subset of variables worthy of further analysis.
-
-```{r}
-summary(m2)
-summary(m2_AIC)
-```
-We can go further by considering the interactions of our variables.
-
-```{r}
-# considering a further subset of those deemed important by initial model, will now consider pairwise interactions
-data2_pw = data2 %>% select(studytime, failures, schoolsup, goout, health, absences, G3)
-
-#data2_pw
-```
-
-```{r, results=FALSE}
-m2_pw = lm(G3~(.)^2,data2_pw)
-m2_pw_AIC = step(m2_pw, scope=G3~(.)^2)
-```
-
-```{r}
-summary(m2_pw)
-summary(m2_pw_AIC)
-```
-
-```{r}
-data_final = data2_pw %>% select(-health,-goout)
-
-model_final = lm(G3~(.)^2,data_final)
-summary(model_final)
-```
-
-
-Through this progression, you can see how we were able to flatten the residual vs fitted values curve through the AIC, improving our model's predictive ability and isolating a key number of demographic features.
-
-```{r}
-plot(m2, which=1)
-plot(m2_AIC, which=1)
-plot(m2_pw, which=1)
-plot(m2_pw_AIC, which=1)
-plot(model_final, which=1)
-
-sum(residuals(m2)^2)
-sum(residuals(m2_AIC)^2)
-sum(residuals(m2_pw)^2)
-sum(residuals(m2_pw_AIC)^2)
-sum(residuals(model_final)^2)
-
-# source: https://astrostatistics.psu.edu/su07/R/html/stats/html/extractAIC.html
-# output = (equivalent degrees of freedom, generalized Akaike Information Criterion)
-extractAIC(m2)
-extractAIC(m2_AIC)
-extractAIC(m2_pw)
-extractAIC(m2_pw_AIC)
-extractAIC(model_final)
-```
-
-All together, you can see as we progress from our initial red model to our final purple model, the curve flattens without overfitting.
-
-```{r}
-library(ggplot2)
-ggplot() +
-  geom_hline(yintercept=0, linetype=2, color = "black") + 
-  # points removed as they force worse scaling
-  # geom_point(data=m2, aes(x=.fitted, y =.resid), color = "red", alpha = 0.1) +
-  geom_smooth(data=m2, aes(x=.fitted, y =.resid), se=FALSE, color = "red", linetype = "twodash") +
-  geom_smooth(data=m2_AIC, aes(x=.fitted, y =.resid), se=FALSE, color = "orange", linetype = "dotdash") +
-  geom_smooth(data=m2_pw, aes(x=.fitted, y =.resid), se=FALSE, color = "green", linetype = "dashed") +
-  geom_smooth(data=m2_pw_AIC, aes(x=.fitted, y =.resid), se=FALSE, color = "blue", linetype = "dotted") +
-  geom_smooth(data=model_final, aes(x=.fitted, y =.resid), se=FALSE, color = "purple", linetype = "solid")
-```
