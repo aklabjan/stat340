@@ -273,49 +273,41 @@ We started off by transforming our data and adding two columns “dropped” and
 <p>We improved the model by using stepwise selection according to AIC.</p>
 <pre><code>## 
 ## Call:
-## glm(formula = dropped ~ G1 + sex + age + famsize + Fedu + traveltime + 
-##     studytime + failures + schoolsup + paid + activities + higher + 
-##     romantic + famrel + goout + Dalc + Walc + health + absences, 
-##     family = &quot;binomial&quot;, data = drop2)
+## glm(formula = dropped ~ G1 + school + age + Fedu + traveltime + 
+##     failures + schoolsup + paid + romantic + Walc + absences, 
+##     data = drop2)
 ## 
 ## Deviance Residuals: 
-##       Min         1Q     Median         3Q        Max  
-## -0.008581   0.000000   0.000000   0.000000   0.008790  
+##      Min        1Q    Median        3Q       Max  
+## -0.55842  -0.13990  -0.05657   0.04737   0.82635  
 ## 
 ## Coefficients:
-##               Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)     -15953      99875  -0.160    0.873
-## G1              -55232     292194  -0.189    0.850
-## sexM              1228      14027   0.088    0.930
-## age               1588       9929   0.160    0.873
-## famsizeLE3       -4059      27476  -0.148    0.883
-## Fedu              2777      15628   0.178    0.859
-## traveltime        1639       7845   0.209    0.835
-## studytime         1824       7716   0.236    0.813
-## failures          2253      12824   0.176    0.861
-## schoolsupyes    -13457      72280  -0.186    0.852
-## paidyes          -4309      18978  -0.227    0.820
-## activitiesyes     3349      22294   0.150    0.881
-## higheryes         9733      52986   0.184    0.854
-## romanticyes       4058      23571   0.172    0.863
-## famrel           -2199      13524  -0.163    0.871
-## goout             1421       8464   0.168    0.867
-## Dalc              4875      23588   0.207    0.836
-## Walc             -2637      14388  -0.183    0.855
-## health           -1874      10892  -0.172    0.863
-## absences         -4884      28638  -0.171    0.865
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   0.131310   0.209842   0.626 0.531847    
+## G1           -0.604770   0.085583  -7.066 7.56e-12 ***
+## schoolMS     -0.112587   0.044768  -2.515 0.012316 *  
+## age           0.021547   0.011823   1.822 0.069160 .  
+## Fedu          0.017383   0.012418   1.400 0.162368    
+## traveltime    0.027615   0.019252   1.434 0.152276    
+## failures      0.053523   0.019581   2.733 0.006558 ** 
+## schoolsupyes -0.145585   0.040774  -3.571 0.000402 ***
+## paidyes      -0.069508   0.026171  -2.656 0.008239 ** 
+## romanticyes   0.078549   0.027746   2.831 0.004885 ** 
+## Walc         -0.030992   0.010327  -3.001 0.002866 ** 
+## absences     -0.010192   0.001674  -6.089 2.77e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## (Dispersion parameter for binomial family taken to be 1)
+## (Dispersion parameter for gaussian family taken to be 0.06383194)
 ## 
-##     Null deviance: 2.5016e+02  on 394  degrees of freedom
-## Residual deviance: 8.7109e-04  on 375  degrees of freedom
-## AIC: 40.001
+##     Null deviance: 34.344  on 394  degrees of freedom
+## Residual deviance: 24.448  on 383  degrees of freedom
+## AIC: 47.932
 ## 
-## Number of Fisher Scoring iterations: 25</code></pre>
+## Number of Fisher Scoring iterations: 2</code></pre>
 <p>This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant weather someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.</p>
 <p>Based on our current knowledge we are not sure as to which model is better between the two as the first has a lower RSS although not by much so on the other hand the second model has better statistics from the extractAIC with a lower degrees of freedom and generalized Akaike Information Criterion. We are certain that school, age, past class failure and weekend drinking are all important factors in being able to predict if a student will drop out or not as they were marked as significant in both models we created. Health, mother’s education, family size, attending nursery school and romantic partner were significant explanatory variables in one model but not the other. At this moment we aren’t able to explain why some variable are significant in one model but not in the other. Further testing would need to be performed on this additional variables to determine if they are significant explanatory variables to predicting weather a student will drop out or not.</p>
 <p>In conclusion, based on our analysis, all students who dropped out had a first grade of 60% or below with the median being around 30%. In addition to using G1 grade to determine if a student is likely to drop out school, age, past class failure and weekend drinking were found to also be significant in its influence weather a student is predicted to drop out.</p>
-<p>Future steps with this question would be to create a decision tree using the 5 significant variables we identified. Could we categorize the students into buckets of likelihood to drop out?</p>
 </div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>

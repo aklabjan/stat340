@@ -213,7 +213,8 @@ m1_AIC = step(m1, scope=dropped~.)
 ```
 
 ```{r,include=FALSE}
-# dont show 
+library(MASS)
+# dont show
 summary(m1)
 sum(residuals(m1)^2)
 extractAIC(m1)
@@ -225,11 +226,13 @@ This model has health, weekend drinking, past class failures, mother's education
 
 We improved the model by using stepwise selection according to AIC.
 ```{r}
-summary(m1_AIC)
+#summary(m1_AIC)
 #sum(residuals(m1_AIC)^2)
 # source: https://astrostatistics.psu.edu/su07/R/html/stats/html/extractAIC.html
 # output = (equivalent degrees of freedom, generalized Akaike Information Criterion)
 #extractAIC(m1_AIC)
+glm.drop.step <- stepAIC(glm(dropped~.,data=drop2),direction = "both", trace = F)
+summary(glm.drop.step)
 ```
 This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant weather someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.
 
@@ -237,25 +240,7 @@ Based on our current knowledge we are not sure as to which model is better betwe
 
 In conclusion, based on our analysis, all students who dropped out had a first grade of 60% or below with the median being around 30%. In addition to using G1 grade to determine if a student is likely to drop out school, age, past class failure and weekend drinking were found to also be significant in its influence weather a student is predicted to drop out. 
 
-```{r}
-library(rpart)
-test_inds <- sample(1:nrow(drop2), nrow(drop2)/5);
-drop.test <- drop2[test_inds,];
-drop.train <- drop2[-test_inds,];
-rt <- rpart(dropped~., data=drop.train, method='anova')
-plot(rt, uniform=TRUE, main='Regression tree for Droppping Out')
-text(rt, all=TRUE, use.n = TRUE, cex=.8 )
 
-rt
-```
-```{r}
-yhat_test <-predict( rt,drop.test);
-test_resids <- yhat_test - drop.test$dropped; # compute the residuals
-# Now square them and take the mean to get MSE.
-# Note that if we just computed the RSS (i.e., no mean, just a sum), it would be
-# harder to directly compare to the test set, which is of a different size.
-mean(test_resids^2)
-```
 
 # Conclusion
 
