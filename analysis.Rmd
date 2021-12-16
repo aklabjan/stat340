@@ -24,6 +24,10 @@ data.frame(Name,NetID)
 Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer our statistical question: (1) What variables have an effect on whether a student will drop out or not?
 
 To_do: conclusion
+We found that the following varibles affected if a student dropped out: 
+
+We found this using _____ . We know that this method is the best because ____. 
+We did not find _____ and if we investigated further we would ______. 
 
 ## Data Set Introduction
 This data is important as in the case of our data Portugal they have a high failure rate in core classes compared to other European countries. If we can identify the students who are most likely to drop out after first quarter then teachers and the school systems can provide additional resources to them. 
@@ -241,7 +245,38 @@ In conclusion, based on our analysis, all students who dropped out had a first g
 
 
 # Conclusion
+-Grades are important (no shit) FIX THIS PLZ 
 
-TO-DO: summarize finding, further questions/exploration 
+DONT CUSS YEAH
+
+-SchoolMS kind of matters (more likely)
+-Failures (obviously) (more likely)
+-schoolsupyes (less likely)
+-paidyes (less likely)
+-romanticyes  (more likely)
+
+Not signifcant:
+The rest of the variables
+
+
+It makes sense that if we are tracking grades throughout the semester, there will be a strong correlation
+
+
+
+
+Further questions:
+
+Investigate more students and expand study 
+
+Look into other areas of the country
+
+Issue: accuracy 
+
+Variables are very subjective, not objective.
+
+1-5 scale of very low to very high vs other numeric attributes 
+
+Consistency in curriculum
+
 
 
