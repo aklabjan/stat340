@@ -223,6 +223,7 @@ extractAIC(m1)
 ```
 
 TO-DO: TALK ABOUT WHAT WE DID(DON'T SHOW) AND WHY
+Through various trials of distribution analysis, our group came to the conclusion that the study used was too small of a sample size to show any sufficient distribution. Also, we noticed that- outside of the obvious stand-outs (G1, failures) - there wasn't enough significance among the rest of the selected variables to answer questions about distribution via plotting. While creating a final model, a factor we found important was the direction in which the variables had affects on drop out rates. For example, success in G1 negatively impacts the dropout rate, but having a romantic life positively impacts the dropout rate. We gave emphasis to this directional analysis due to the future questions it would produce down the road if further studies were desired.
 
 This model has health, weekend drinking, past class failures, mother's education, age and school as being statistically significant when it comes to whether a student will drop out or not. This model has a degrees of freedom of 40 and AIC of 144.67 and RSS 64.67.
 
