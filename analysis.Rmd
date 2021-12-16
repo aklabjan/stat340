@@ -21,7 +21,7 @@ NetID <- c("griffithtopp","jtwhite4","bli378","aklabjan","zwong4","jlarget")
 data.frame(Name,NetID)
 ```
 ## Abstract
-Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer our statistical question: (1) What variables have an effect on weather a student will drop out or not?
+Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information. With this data, we created models to answer our statistical question: (1) What variables have an effect on whether a student will drop out or not?
 
 To_do: conclusion
 
@@ -30,13 +30,13 @@ This data is important as in the case of our data Portugal they have a high fail
 
 The data comes from schools in Portugal through school records as well as questionnaires. This data was collected by Paulo Cortez and Alice Silva who work for the department of Information Systems/Algoritmi R&D Centre at the University of Minho. It started off as two datasets, one with student grades and another with the student questionnaire responses. It was then combined before doing analysis. This study is significant as specifically in Portugal, the proportion of students leaving class early is 40% whereas the average in the rest of the European Union is 15%. This is just one example of a statistic where Portugal is near the bottom compared to the rest of the European Union. Pinpointing a few of these factors could help officials develop a solution to improve Portugal’s educational performance.
 
-The following are the variables available in our dataset. We have bolded those we expect to use as explanatory variables. We are bolding most of the variables because we want to resist the urge to determine the model because it is run. We anticipate being able to use forward and backward stepwise selection.
+The following are the variables available in our dataset. We have bolded those we expect to use as explanatory variables. We are bolding most of the variables because we want to resist the urge to determine the model before it is run. We anticipate being able to use forward and backward stepwise selection.
 
 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira)
 We can train our model on one of the schools to use it to test the squared residuals on the other school. This will allow us to see whether our dataset will be appropriate for all schools or whether one school is just harder than the other.
 
 __sex__ - student's sex (binary: 'F' - female or 'M' - male)
-*We know that girls tend to get higher grades than boys in primary school (nytimes.com/2019/02/07/opinion/sunday/girls-school-confidence.html#:~:text=From%20elementary%20school%20through%20college,Girls%20consistently%20outperform%20boys%20academically.) so potentially there could be a correlation between sex and grades in secondary school.
+We know that girls tend to get higher grades than boys in primary school (nytimes.com/2019/02/07/opinion/sunday/girls-school-confidence.html#:~:text=From%20elementary%20school%20through%20college,Girls%20consistently%20outperform%20boys%20academically.) so potentially there could be a correlation between sex and grades in secondary school.
 
 __age__ - student's age (numeric: from 15 to 22)
 We are not sure if age will matter but are thinking of including it anyway in case it is helpful for stepwise selection.
@@ -123,8 +123,6 @@ __absences__ - number of school absences (numeric: from 0 to 93)
 The number of absences can correlate with student performance.
 
 ```{r,warning=FALSE}
-library(tidyverse)
-library(formattable)
 data <- read.csv("student-mat.csv")
 head(data,3)
 ```
@@ -138,7 +136,7 @@ cols[] <- "black"
 cols[grades$G3 == 0] <- "red"
 pairs(grades,col=cols)
 ```
-The coloring in the plot was determined by if the G3 column in our data set was equal to zero. The red points represent students who dropped out of the class before the end of the year. This trend lead us to the focus of our report: What variables have an effect on weather a student will drop out?
+The coloring in the plot was determined by if the G3 column in our data set was equal to zero. The red points represent students who dropped out of the class before the end of the year. This trend lead us to the focus of our report: What variables have an effect on whether a student will drop out?
 ```{r}
 drop <- data %>%
   mutate(dropped = case_when(
@@ -222,7 +220,7 @@ extractAIC(m1)
 
 TO-DO: TALK ABOUT WHAT WE DID(DON'T SHOW) AND WHY
 
-This model has health, weekend drinking, past class failures, mother's education, age and school as being statistically significant when it comes to weather a student will drop out or not. This model has a degrees of freedom of 40 and AIC of 144.67 and RSS 64.67.
+This model has health, weekend drinking, past class failures, mother's education, age and school as being statistically significant when it comes to whether a student will drop out or not. This model has a degrees of freedom of 40 and AIC of 144.67 and RSS 64.67.
 
 We improved the model by using stepwise selection according to AIC.
 ```{r}
@@ -234,11 +232,11 @@ We improved the model by using stepwise selection according to AIC.
 glm.drop.step <- stepAIC(glm(dropped~.,data=drop2),direction = "both", trace = F)
 summary(glm.drop.step)
 ```
-This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant weather someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.
+This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant whether someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.
 
-Based on our current knowledge we are not sure as to which model is better between the two as the first has a lower RSS although not by much so on the other hand the second model has better statistics from the extractAIC with a lower degrees of freedom and  generalized Akaike Information Criterion. We are certain that school, age, past class failure and weekend drinking are all important factors in being able to predict if a student will drop out or not as they were marked as significant in both models we created. Health, mother's education, family size, attending nursery school and romantic partner were significant explanatory variables in one model but not the other. At this moment we aren't able to explain why some variable are significant in one model but not in the other. Further testing would need to be performed on this additional variables to determine if they are significant explanatory variables to predicting weather a student will drop out or not. 
+Based on our current knowledge we are not sure as to which model is better between the two as the first has a lower RSS although not by much so on the other hand the second model has better statistics from the extractAIC with a lower degrees of freedom and  generalized Akaike Information Criterion. We are certain that school, age, past class failure and weekend drinking are all important factors in being able to predict if a student will drop out or not as they were marked as significant in both models we created. Health, mother's education, family size, attending nursery school and romantic partner were significant explanatory variables in one model but not the other. At this moment we aren't able to explain why some variable are significant in one model but not in the other. Further testing would need to be performed on this additional variables to determine if they are significant explanatory variables to predicting whether a student will drop out or not. 
 
-In conclusion, based on our analysis, all students who dropped out had a first grade of 60% or below with the median being around 30%. In addition to using G1 grade to determine if a student is likely to drop out school, age, past class failure and weekend drinking were found to also be significant in its influence weather a student is predicted to drop out. 
+In conclusion, based on our analysis, all students who dropped out had a first grade of 60% or below with the median being around 30%. In addition to using G1 grade to determine if a student is likely to drop out school, age, past class failure and weekend drinking were found to also be significant in its influence whether a student is predicted to drop out. 
 
 
 
