@@ -249,21 +249,9 @@ In conclusion, based on our analysis, all students who dropped out had a first g
 
 We discovered that the variables with the largest impact were variables that rely on grades. This makes logical sense, because the grades are recorded throughout the semester. The grades will be relatively consistent- a student couldn't go from failing to a perfect score. This also means that if a student has failures, this will impact grades. Our analysis proved this, which helps us show that our analysis makes sense. We discovered if a student had failed a class, they were more likely to drop out. If a student has higher grades, they were less likely to fail out. A suprising discovery an impactful factor in if a student is in a relationship, they are at high risk for dropping out. Maybe there is some merit in parents having rules about not dating in high school! Two other factors that impact if a student will drop out is if the student is recieving extra support from the school, and if a student takes extra paid classes within the course subject. Thankfully, these variables showed that if a student is recieving help, they are less likely to drop out. 
 
+If we had more time, resources, funding, etc, there are a few ways we would expand this project, and answer some further questions. First, an issue we found was because this sample was not very large and very specific, this means we could not draw accurate conclusions to apply our findings to other groups. We also could not find many significant variables, and part of this could be due to the lack of participants. Another issue is with the way the research was conducted. A few varibles were measured by students answering a range from 1-5 (1 being the lowest, 5 the highest) about some of their habits. For instance, instead of asking how many days a week do students consume alcohol or how many standard drinks do they consume, they ask students do rate themselves basically. This is not very standardized and more standardized questions would likely lead to better results. Another aspect to consider if the study was expanded is ensuring the curriculum is similar. For instance, if this study expanded to a variety of countries in Europe, then measuring grades in Portuguese might not be the best idea.  We came up with a few questions that could be investigated further: How would our findings change if the study was expanded upon? Would different areas of the world have different results? If we could identify students that are at heightened risk for dropping out and provide them extra resources, would that be benefical? Would that be ethical? What factors should educators be aware of when it comes to preventing students from dropping out? What are the most cost effective ways to prevent students from dropping out? What behaviors should parents be concerned about with their child tha tcould increase their risk of droppping out? 
 
-
-Further questions:
-
-Investigate more students and expand study 
-
-Look into other areas of the country
-
-Issue: accuracy 
-
-Variables are very subjective, not objective.
-
-1-5 scale of very low to very high vs other numeric attributes 
-
-Consistency in curriculum
+We were able to come to a few conclusions, but not many based on our analysis. We tried a variety of methods to investigate our initial question of  what variables have an effect on whether a student will drop out or not?  All in all, we conducted a through analysis, but could find some more impactful solutions if we had more resources and data. 
 
 
 
