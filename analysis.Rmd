@@ -185,12 +185,16 @@ ggplot(drop, aes(x=G1, group=completedCourse, fill=completedCourse)) +
 ```
 
 
-```{r,include=FALSE}
-ggplot(drop, aes(x=completedCourse, y=G1)) + 
-  geom_violin(trim=FALSE) +
-  ggtitle("First Period Grade Distribution by Dropped Out")+
-  xlab("Students Dropped Out By End of Year")+
-  ylab("First Period Grade in Percentage")
+```{r}
+drop %>%
+  mutate(flip=case_when(
+    completedCourse==TRUE~FALSE,
+    completedCourse==FALSE~TRUE)) %>%
+  ggplot(aes(x=flip, y=G1)) + 
+    geom_violin(trim=FALSE) +
+    ggtitle("First Period Grade Distribution by Dropped Out")+
+    xlab("Students Dropped Out By End of Year")+
+    ylab("First Period Grade in Percentage")
 ```
 Compared to students who did not drop the class, we found a noticeable difference between first period grades. While only the highest scoring students among the dropped category were able to score ~60%, the mean of all student's scores during the first period was ~60%. Thus, we can conclude that students that dropped the class can be predicted to do considerably worse than those who did not drop the class. This seems pretty obvious, but could there be other factors that lead to this outcome?
 
@@ -212,16 +216,17 @@ m1_AIC = step(m1, scope=dropped~.)
 ```
 
 ```{r,include=FALSE}
-library(MASS)
 # dont show
+library(MASS)
 summary(m1)
-sum(residuals(m1)^2)
-extractAIC(m1)
+#sum(residuals(m1)^2)
+#extractAIC(m1)
 ```
 
 Through various trials of distribution analysis, our group came to the conclusion that the study used was too small of a sample size to show any sufficient distribution. Also, we noticed that - outside of the obvious stand-outs (G1, failures) - there wasn't enough significance among the rest of the selected variables to answer questions about distribution via plotting. While creating a final model, a factor we found important was the direction in which the variables had affects on drop out rates. For example, success in G1 negatively impacts the dropout rate, but having a romantic life positively impacts the dropout rate. We gave emphasis to this directional analysis due to the future questions it would produce down the road if further studies were desired.
 
 This model has health, weekend drinking, past class failures, mother's education, age and school as being statistically significant when it comes to whether a student will drop out or not. This model has a degrees of freedom of 40 and AIC of 144.67 and RSS 64.67.
+__where did we get this information? summary(m1) has no significant values also im not sure how we got the AIC and RSS numbers but the model says AIC is 82__
 
 We improved the model by using stepwise selection according to AIC.
 ```{r}
@@ -234,6 +239,7 @@ glm.drop.step <- stepAIC(glm(dropped~.,data=drop2),direction = "both", trace = F
 summary(glm.drop.step)
 ```
 This model has school, age, family size, past class failures, weekend drinking, attending nursery school and romantic partner as being statistically significant on whether someone will drop out. This model has a degrees of freedom of 17 and AIC of 110.91 and RSS 110.91.
+__again, not sure how we got these values, summary(.) has g1, schoolMS, failures,schoolsupyes,paidyes,romanticyes,walc,absences as significant and AIC as 47, analysis of which model is better would still be correct__
 
 Based on our current knowledge we are not sure as to which model is better between the two as the first has a lower RSS although not by much so on the other hand the second model has better statistics from the extractAIC with a lower degrees of freedom and generalized Akaike Information Criterion. We are certain that school, age, past class failure and weekend drinking are all important factors in being able to predict if a student will drop out or not as they were marked as significant in both models we created. Health, mother's education, family size, attending nursery school and romantic partner were significant explanatory variables in one model but not the other. At this moment we aren't able to explain why some variable are significant in one model but not in the other. Further testing would need to be performed on this additional variables to determine if they are significant explanatory variables to predicting whether a student will drop out or not. 
 
