@@ -1,0 +1,8 @@
+Our data set describes 395 students, their math grades for a given semester, recorded on three occasions, as well as generic and consistent demographic information.
+With this data, we created models to answer our statistical question: (1) What variables have an effect on whether a student will drop out or not?
+We found that the following variables affected if a student dropped out: Dating, Failed a class, Whether they took extra paid classes for the course subject, Whether they are receiving extra help from the school
+We found these four variables affected whether a student dropped out starting with using data transformation by adding a "dropped" and "completed course" column to our dataset.
+After data transformation, we then created a model with dropped as response and everything else in our dataset as the explanatory variables to see how this would affect the
+drop rate. Finally we then improved the model by using stepwise selection according to the Akaike Information Criterion. We know that this method is the best because ____. 
+We did not find as many significant variables as we would have liked and if we investigated further we would we would have increased our small sample size and expanded our 
+research to answer other questions such as: How would our findings change if the study was expanded upon? Would different areas of the world have different results? 
